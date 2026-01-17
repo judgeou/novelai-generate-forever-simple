@@ -1,0 +1,1 @@
+# novelai-generate-forever-simple
