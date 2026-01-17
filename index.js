@@ -41,38 +41,15 @@
         btn.textContent = 'Generation Forever: ' + status
     })
 
-    // 粘贴按钮（模拟 Ctrl+V 触发图片粘贴）
+    // 粘贴按钮（模拟 Ctrl+V）
     const pasteBtn = document.createElement('button')
     pasteBtn.style = `
     color: black;
     cursor: pointer;
 `
     pasteBtn.textContent = 'Paste'
-    pasteBtn.addEventListener('click', async () => {
-        try {
-            const clipboardItems = await navigator.clipboard.read()
-            for (const item of clipboardItems) {
-                for (const type of item.types) {
-                    if (type.startsWith('image/')) {
-                        const blob = await item.getType(type)
-                        const file = new File([blob], 'pasted-image.png', { type })
-                        const dataTransfer = new DataTransfer()
-                        dataTransfer.items.add(file)
-                        
-                        const pasteEvent = new ClipboardEvent('paste', {
-                            bubbles: true,
-                            cancelable: true,
-                            clipboardData: dataTransfer
-                        })
-                        document.dispatchEvent(pasteEvent)
-                        return
-                    }
-                }
-            }
-        } catch (err) {
-            console.error('粘贴失败:', err)
-            alert('粘贴失败，请确保已授予剪贴板权限')
-        }
+    pasteBtn.addEventListener('click', () => {
+        document.execCommand('paste')
     })
 
     btnContainer.appendChild(btn)
