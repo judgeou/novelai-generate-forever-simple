@@ -41,7 +41,7 @@
         btn.textContent = 'Generation Forever: ' + status
     })
 
-    // 粘贴按钮
+    // 粘贴按钮（模拟 Ctrl+V 触发图片粘贴）
     const pasteBtn = document.createElement('button')
     pasteBtn.style = `
     color: black;
@@ -50,16 +50,24 @@
     pasteBtn.textContent = 'Paste'
     pasteBtn.addEventListener('click', async () => {
         try {
-            const text = await navigator.clipboard.readText()
-            const promptEl = [...document.querySelectorAll('textarea')].find(item => item.clientHeight > 20)
-            if (promptEl) {
-                // 触发 focus 事件
-                promptEl.focus()
-                // 设置文本内容
-                promptEl.value = text
-                // 触发 input 事件以确保 React/Vue 等框架能够检测到变化
-                promptEl.dispatchEvent(new Event('input', { bubbles: true }))
-                promptEl.dispatchEvent(new Event('change', { bubbles: true }))
+            const clipboardItems = await navigator.clipboard.read()
+            for (const item of clipboardItems) {
+                for (const type of item.types) {
+                    if (type.startsWith('image/')) {
+                        const blob = await item.getType(type)
+                        const file = new File([blob], 'pasted-image.png', { type })
+                        const dataTransfer = new DataTransfer()
+                        dataTransfer.items.add(file)
+                        
+                        const pasteEvent = new ClipboardEvent('paste', {
+                            bubbles: true,
+                            cancelable: true,
+                            clipboardData: dataTransfer
+                        })
+                        document.dispatchEvent(pasteEvent)
+                        return
+                    }
+                }
             }
         } catch (err) {
             console.error('粘贴失败:', err)
