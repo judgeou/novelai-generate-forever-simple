@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Generate Forever Simple
 // @namespace    http://tampermonkey.net/
-// @version      1.1
+// @version      1.2
 // @description  create a generate forever button
 // @author       judgeou
 // @copyright    2024+, judgeou (https://github.com/judgeou)
@@ -13,9 +13,19 @@
 
 (function () {
     let status = 'OFF'
+    
+    // 创建按钮容器
+    const btnContainer = document.createElement('div')
+    btnContainer.style = `
+    position: fixed;
+    display: flex;
+    gap: 10px;
+    z-index: 9999;
+`
+    
+    // Generation Forever 按钮
     const btn = document.createElement('button')
     btn.style = `
-    position: fixed;
     color: black;
     cursor: pointer;
 `
@@ -31,7 +41,20 @@
         btn.textContent = 'Generation Forever: ' + status
     })
 
-    document.body.appendChild(btn)
+    // 粘贴按钮（模拟 Ctrl+V）
+    const pasteBtn = document.createElement('button')
+    pasteBtn.style = `
+    color: black;
+    cursor: pointer;
+`
+    pasteBtn.textContent = 'Paste'
+    pasteBtn.addEventListener('click', () => {
+        document.execCommand('paste')
+    })
+
+    btnContainer.appendChild(btn)
+    btnContainer.appendChild(pasteBtn)
+    document.body.appendChild(btnContainer)
 
     function loop () {
         if (status == 'ON') {
@@ -44,7 +67,5 @@
     }
 
     loop()
-
-    const promptEl = [...document.querySelectorAll('textarea')].find(item => item.clientHeight > 20)
     
 })()
